@@ -9,10 +9,11 @@
 'use strict';
 
 var expect = require('chai').expect;
-var MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
+const Books = require('./books');
 var ObjectId = require('mongodb').ObjectId;
-const MONGODB_CONNECTION_STRING = process.env.DB;
-//Example connection: MongoClient.connect(MONGODB_CONNECTION_STRING, function(err, db) {});
+const MONGOOSE_CONNECTION_STRING = process.env.DB;
+mongoose.connect(MONGOOSE_CONNECTION_STRING, {useNewUrlParser: true, useFindAndModify: false});
 
 module.exports = function (app) {
 
@@ -24,6 +25,11 @@ module.exports = function (app) {
     
     .post(function (req, res){
       var title = req.body.title;
+      Books.insert(req.body)
+      .then(book => {
+        
+      })
+      .catch(err => res.json(err));
       //response will contain new book object including atleast _id and title
     })
     
