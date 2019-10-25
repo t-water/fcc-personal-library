@@ -87,9 +87,13 @@ module.exports = function (app) {
       .then(book => {
         if(book != null){
           book.comments.push(comment);
-          res.status = 200;
-          res.setHeader('application/json')
-          res.json(book)
+          book.save()
+          .then(book => {
+            res.status = 200;
+            res.setHeader('Content-type', 'application/json')
+            res.json(book)
+          }, err => next(err))
+          .catch(err => next(err))
         }else{
           let err = new Error('Book not found');
           err.status = 404;
