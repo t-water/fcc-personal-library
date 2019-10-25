@@ -41,30 +41,9 @@ suite('Functional Tests', function() {
     suite('POST /api/books with title => create book object/expect book object', function() {
       
       test('Test POST /api/books with title', function(done) {
-        chai.request(server)
-        .post('/api/books')
-        .send({
-          title: 'Example Title'
-        })
-        .end(function(err, res){
-          expect(err).to.be(null)
-          assert.equal(res.status, 200);
-          assert.property(res.body, 'title', 'Book should have a title');
-          assert.property(res.body, '_id', 'Book should have a unique id');
-          done();
-        })
       });
       
       test('Test POST /api/books with no title given', function(done) {
-       chai.request(server)
-        .post('/api/books')
-        .send({
-          title: ''
-        })
-        .end(function(err, res){
-          console.log(err)
-          done();
-        })
       });
       
     });
