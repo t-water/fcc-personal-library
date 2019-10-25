@@ -42,7 +42,13 @@ module.exports = function (app) {
     })
     
     .delete(function(req, res, next){
-
+      	Books.remove({})
+        .then((resp) => {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(resp)
+        }, (err) => next(err))
+        .catch((err) => next(err))
     });
 
 
@@ -55,7 +61,7 @@ module.exports = function (app) {
         if(book != null){
           res.statusCode = 200;
           res.setHeader('Content-type', 'application/json');
-          res.json({"title": book.title, "_id": book._id, "comments": book.comments});
+          res.json({"_id": book._id, "title": book.title, "comments": book.comments});
         }else{
           let err = new Error('Book not found');
           err.status = 404;
@@ -63,7 +69,6 @@ module.exports = function (app) {
         }
       }, err => next(err))
       .catch(err => next(err))
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
     })
     
     .post(function(req, res, next){
@@ -72,14 +77,20 @@ module.exports = function (app) {
       Books.findById(req.params.id)
       .then(book => {
         if(book != null){
-          book.comments.push(comment);
-          book.save()
-          .then(book => {
-            res.status = 200;
-            res.setHeader('Content-type', 'application/json')
-            res.json({"book_id": book._id, "comment": book.comments[book.comments.length -1]})
-          }, err => next(err))
-          .catch(err => next(err))
+          if(comment != ''){
+            book.comments.push(comment);
+            book.save()
+            .then(book => {
+              res.status = 200;
+              res.setHeader('Content-type', 'application/json')
+              res.json({"book_id": book._id, "comment": book.comments[book.comments.length -1]})
+            }, err => next(err))
+            .catch(err => next(err))
+          }else{
+            let err = new Error('No comment given');
+            err.status = 404;
+            return next(err);
+          }
         }else{
           let err = new Error('Book not found');
           err.status = 404;
@@ -91,10 +102,10 @@ module.exports = function (app) {
     
     .delete(function(req, res, next){
       var bookid = req.params.id;
-      Books.findById(req.body._id)
+      Books.findById(bookid)
       .then(book => {
         if(book != null){
-          Books.findByIdAndRemove(req.body._id)
+          Books.findByIdAndRemove(bookid)
           .then(book => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/text')
@@ -109,5 +120,4 @@ module.exports = function (app) {
       },err => next(err))
       .catch(err => next(err))
     });
-  
 };
